@@ -31,6 +31,22 @@ interfaces {
             }
         }
     }
+    ethernet eth2 {
+        address 10.0.6.3/24
+        description DMZ
+        duplex auto
+        hw-id 00:50:56:a1:c0:6f
+        smp_affinity auto
+        speed auto
+        vrrp {
+            vrrp-group 20 {
+                advertise-interval 1
+                preempt true
+                priority 100
+                virtual-address 10.0.6.1/24
+            }
+        }
+    }
     loopback lo {
     }
 }
@@ -44,7 +60,7 @@ nat {
             inbound-interface eth0
             protocol tcp
             translation {
-                address 10.0.5.100
+                address 10.0.6.10
             }
         }
         rule 20 {
@@ -65,6 +81,16 @@ nat {
             outbound-interface eth0
             source {
                 address 10.0.5.0/24
+            }
+            translation {
+                address masquerade
+            }
+        }
+        rule 20 {
+            description "NAT FROM DMZ TO WAN"
+            outbound-interface eth0
+            source {
+                address 10.0.6.0/24
             }
             translation {
                 address masquerade

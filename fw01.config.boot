@@ -17,7 +17,7 @@ interfaces {
     }
     ethernet eth1 {
         address 10.0.5.2/24
-        description SEC440-LAN
+        description LAN
         duplex auto
         hw-id 00:50:56:a1:81:9c
         smp_affinity auto
@@ -28,6 +28,22 @@ interfaces {
                 preempt true
                 priority 150
                 virtual-address 10.0.5.1/24
+            }
+        }
+    }
+    ethernet eth2 {
+        address 10.0.6.2/24
+        description DMZ
+        duplex auto
+        hw-id 00:50:56:a1:7b:08
+        smp_affinity auto
+        speed auto
+        vrrp {
+            vrrp-group 20 {
+                advertise-interval 1
+                preempt true
+                priority 150
+                virtual-address 10.0.6.1/24
             }
         }
     }
@@ -70,6 +86,16 @@ nat {
                 address masquerade
             }
         }
+        rule 20 {
+            description "NAT FROM DMZ TO WAN"
+            outbound-interface eth0
+            source {
+                address 10.0.6.0/24
+            }
+            translation {
+                address masquerade
+            }
+        }
     }
 }
 service {
@@ -77,6 +103,7 @@ service {
         forwarding {
             cache-size 150
             listen-on eth1
+            listen-on eth2
         }
     }
 }
